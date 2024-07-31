@@ -1,0 +1,23 @@
+coordinates = {
+    'A': (1, 2),
+    'B': (4, 6),
+    'C': (7, 1),
+    'D': (2, 4)
+}
+def manhattan_distance(p1, p2):
+    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+nodes = list(coordinates.keys())
+
+heuristic_table = {}
+for node in nodes:
+    heuristic_table[node] = {}
+    for node2 in nodes:
+        heuristic_table[node][node2] = 0
+
+for node in nodes:
+    for node2 in nodes:
+        if node != node2:
+           heuristic_table[node][node2] = manhattan_distance(coordinates[node], coordinates[node2])
+
+for row in nodes:
+    print(f"{row}: {heuristic_table[row]}")
