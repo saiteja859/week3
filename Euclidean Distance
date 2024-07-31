@@ -1,0 +1,25 @@
+import math
+coordinates = {
+    'A': (1, 2),
+    'B': (4, 6),
+    'C': (7, 1),
+    'D': (2, 4)
+}
+
+
+def Euclidean(p1 , p2):
+    return math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)
+nodes = list(coordinates.keys())
+#creating empty heuristic table
+heuristic_table = {}
+for node in nodes:
+    heuristic_table[node] = {}
+    for node2 in nodes:
+        heuristic_table[node][node2] = 0
+#calculating the euclidean distances
+for node in nodes:
+    for node2 in nodes:
+        if node!=node2:
+            heuristic_table[node][node2] = Euclidean(coordinates[node],coordinates[node2])
+for node in nodes:
+    print(f"{node}: {heuristic_table[node]}")
