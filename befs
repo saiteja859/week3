@@ -1,0 +1,103 @@
+import math
+from queue import PriorityQueue
+graph = {}
+coordinates = {}
+heuristic_table = {}
+nodes = []
+
+
+
+
+def readGraph():
+    n = int(input("Enter the number of nodes in the graph: "))
+    for i in range (n):
+        node = input(f"Enter node {i+1}: ")
+        adjNodes = input(f"Enter the adjacent nodes of {node} seaprated by spaces: ").split()
+        graph[node] = adjNodes
+        nodes.append(node)
+
+
+
+
+def readCoordinates():
+    n = len(graph)
+    for node in nodes:
+        x , y = map(int,(input(f"Enter the x and y coordinates of node {node} separated by space: ").split()))
+        coordinates[node] = (x,y)
+    for node in nodes:
+        heuristic_table[node] = {}
+        for node2 in nodes:
+          heuristic_table[node][node2] = 0
+
+
+
+
+#caluculating the euclidean distances
+def calculate():
+    for node in nodes:
+        for node2 in nodes:
+            if node!=node2:
+                p1 = coordinates[node]
+                p2 = coordinates[node2]
+                heuristic_table[node][node2] = math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)
+    for node in nodes:
+        print(f"{node}: {heuristic_table[node]}")
+
+
+
+
+def BEFS():
+    start = input("Enter the start node: ")
+    goal = input("Enter the goal node: ")
+    queue = PriorityQueue()
+    path = []
+    deadend = []
+    visited = set()
+    queue.put((heuristic_table[start][goal] ,start))
+    path.append(start)
+    visited.add(start)
+    found = False
+    while not queue.empty():
+        current_priority,node = queue.get()
+        if node==goal:
+            found = True
+            path.append(node)
+            break
+        #checking whether the last node of path is deadend or not
+        check = True
+        last = path[-1]
+        for i in graph[last]:
+            if(i not in deadend):
+                check = False
+                break
+        if check==True:
+            deadend.append(last)
+            path.pop()
+        #checking if adding curr node is useful or not
+        useful = False
+
+
+
+
+        for curr in graph[node]:
+            if curr not in visited:
+                queue.put((heuristic_table[curr][goal],curr))
+                visited.add(curr)
+                useful = True
+        if useful and node!=start:
+            path.append(node)
+        else:
+            deadend.append(node)
+    if found==True:
+        print("PATH IS : ",end=' ')
+        print("->".join(path))
+    else:
+        print("NO PATH FOUND TO GOAL.")
+
+
+
+
+readGraph()
+readCoordinates()
+calculate()
+BEFS()
