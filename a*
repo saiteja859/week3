@@ -1,0 +1,81 @@
+import math
+from queue import PriorityQueue
+
+# Initialize graph and coordinates
+graph = {}
+coordinates = {}
+nodes = []
+
+# Function to read the entire graph
+def readGraph():
+    n = int(input("Enter the number of nodes in the graph: "))
+    for i in range(n):
+        node = input(f"Enter node {i+1}: ")
+        nodes.append(node)
+
+        # Read coordinates
+        x, y = map(int, input(f"Enter the x and y coordinates of node {node} separated by space: ").split())
+        coordinates[node] = (x, y)
+
+        # Read adjacent nodes and costs
+        adjNodes = input(f"Enter the adjacent nodes and their costs of {node} separated by spaces (format: node cost node cost ...): ").split()
+        graph[node] = []
+        for j in range(0, len(adjNodes), 2):
+            adjNode = adjNodes[j]
+            cost = float(adjNodes[j + 1])
+            graph[node].append((adjNode, cost))
+
+# Heuristic function to calculate Euclidean distance
+def heuristic(a, b):
+    p1 = coordinates[a]
+    p2 = coordinates[b]
+    return math.sqrt((p1[0] - p2[0]) * 2 + (p1[1] - p2[1]) * 2)
+
+# A* algorithm implementation
+def a_star():
+    start = input("Enter the start node: ")
+    goal = input("Enter the goal node: ")
+    # open_set is initialized to store nodes to be explored, prioritized by their f_score. The start node is added with a priority of 0.
+    open_set = PriorityQueue()
+    open_set.put((0, start))
+    came_from = {}
+
+    # The g_score represents the cost of the shortest path from the start node to a given node.
+    g_score = {}
+    for node in graph:
+        g_score[node] = float('inf')
+    g_score[start] = 0
+
+    # The f_score represents an estimate of the total cost from the start node to the goal node through a given node.
+    # f_score = g_score + h_score
+    f_score = {}
+    for node in graph:
+        f_score[node] = float('inf')
+    f_score[start] = heuristic(start, goal)
+
+    while not open_set.empty():
+        current = open_set.get()[1]
+
+        if current == goal:
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(start)
+            path.reverse()
+            print("PATH IS:", " -> ".join(path))
+            return
+
+        for neighbor, cost in graph[current]:
+            tentative_g_score = g_score[current] + cost
+            if tentative_g_score < g_score[neighbor]:
+                came_from[neighbor] = current
+                g_score[neighbor] = tentative_g_score
+                f_score[neighbor] = g_score[neighbor] + heuristic(neighbor, goal)
+                open_set.put((f_score[neighbor], neighbor))
+
+    print("NO PATH FOUND TO GOAL.")
+
+# Example usage
+readGraph()
+a_star()
